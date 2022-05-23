@@ -15,6 +15,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('courses', [CourseController::class, 'courses']);
     Route::get('lessons/{id}', [LessonController::class, 'lessons']);
     Route::get('lesson/{id}', [LessonController::class, 'lesson']);
+    Route::get('questions/{id}', [LessonController::class, 'questions']);
     Route::get('complete_lesson/{id}', [LessonController::class, 'completedLesson']);
     Route::get('user', [UserController::class, 'user']);
     Route::post('user', [UserController::class, 'user_update']);

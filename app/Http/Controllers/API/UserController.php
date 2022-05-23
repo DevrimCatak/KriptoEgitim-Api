@@ -77,7 +77,9 @@ class UserController extends Controller
         $saved =$user->save();
 
         if ($saved){
-            auth::user()->currentAccessToken()->delete();
+            foreach ($user->tokens as $token) {
+                $token->delete();
+            }
             $tokenStr = $user->createToken('login')->plainTextToken;
             return response()->json(['status' => true, 'message' => "Güncelleme Başarılı.",
                 'data'=>["token" => $tokenStr, "name" => $user->name, "email" => $user->email]]);
