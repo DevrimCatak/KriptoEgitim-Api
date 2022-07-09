@@ -13,20 +13,20 @@ class CourseController extends Controller
     public function courses(){
         $user = auth('sanctum')->user();
 
-        /*$courses = Course::leftjoin('Lessons', 'Lessons.course_id', '=', 'Courses.id')
-            ->leftJoin('Completed_lessons', function ($leftJoin) use ($user) {
-                $leftJoin->on('Completed_lessons.lesson_id', '=', 'Lessons.id')
-                ->on('Completed_lessons.user_id', '=', $user->id);
+        /*$courses = Course::leftjoin('lessons', 'lessons.course_id', '=', 'courses.id')
+            ->leftJoin('completed_lessons', function ($leftJoin) use ($user) {
+                $leftJoin->on('completed_lessons.lesson_id', '=', 'lessons.id')
+                ->on('completed_lessons.user_id', '=', $user->id);
             })
-            ->selectRaw("Courses.title, Courses.detail, Courses.banner, Courses.banner_type, Courses.status,
-            count(lessons.id) as lessons_count, count(Completed_lessons.id) as completed_lessons_count" )
-            ->groupBy("Courses.id")
+            ->selectRaw("courses.title, courses.detail, courses.banner, courses.banner_type, courses.status,
+            count(lessons.id) as lessons_count, count(completed_lessons.id) as completed_lessons_count" )
+            ->groupBy("courses.id")
             ->get();*/
-        $courses = DB::select('select Courses.title, Courses.detail, Courses.banner, Courses.banner_type, Courses.status,
-            count(lessons.id) as lessons_count, count(Completed_lessons.id) as completed_lessons_count from `courses`
-            left join Lessons on Lessons.course_id = Courses.id
-            left join Completed_lessons on Completed_lessons.lesson_id = Lessons.id
-            and Completed_lessons.user_id = ? group by Courses.id' , [$user->id]);
+        $courses = DB::select('select courses.id, courses.title, courses.detail, courses.banner, courses.banner_type, courses.status,
+            count(lessons.id) as lessons_count, count(completed_lessons.id) as completed_lessons_count from courses
+            left join lessons on lessons.course_id = courses.id
+            left join completed_lessons on completed_lessons.lesson_id = lessons.id
+            and completed_lessons.user_id = ? group by courses.id, courses.title, courses.detail, courses.banner, courses.banner_type, courses.status, courses.id' , [$user->id]);
         if($courses != null){
             return response()->json(['status' => true, 'message' => "Kurslar başarıyla listelendi",'data'=>$courses]);
         }else{

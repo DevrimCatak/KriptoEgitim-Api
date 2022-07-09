@@ -77,6 +77,5 @@ class AuthController extends Controller
         return response()->json(['status' => true, 'message' => "Giriş işleminiz başarılı bir şekilde tamamlandı!",
             'data'=>["token" => $tokenStr, "name" => $user->name, "email" => $user->email]]);
 
-
     }
 }

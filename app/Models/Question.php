@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Question extends Model
-{
+class Question extends Model{
     use HasFactory;
 
     public $timestamps = false;
@@ -17,8 +16,7 @@ class Question extends Model
         'lesson_id'
     ];
 
-    public function answers()
-    {
+    public function answers(){
         return $this->hasMany(Answer::class, 'question_id', 'id');
     }
 }

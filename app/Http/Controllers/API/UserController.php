@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-class UserController extends Controller
-{
+class UserController extends Controller{
     public function user(){
-        $user=auth('sanctum')->user();
+        $user = auth('sanctum')->user();
         return response()->json(['status' => true, 'message' => "Kullanıcı Bilgileri Başarıyla Getirlidi",
             'data'=> $user->only(["name","phone","email"])]);
     }
@@ -77,9 +77,10 @@ class UserController extends Controller
         $saved =$user->save();
 
         if ($saved){
-            foreach ($user->tokens as $token) {
+            DB::table('personal_access_tokens')->where('tokenable_id', $user->id)->delete();
+            /*foreach ($user->tokens as $token) {
                 $token->delete();
-            }
+            }*/
             $tokenStr = $user->createToken('login')->plainTextToken;
             return response()->json(['status' => true, 'message' => "Güncelleme Başarılı.",
                 'data'=>["token" => $tokenStr, "name" => $user->name, "email" => $user->email]]);

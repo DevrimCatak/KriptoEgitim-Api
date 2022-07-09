@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CourseController;
+use App\Http\Controllers\API\ExchangesController;
 use App\Http\Controllers\API\LessonController;
 use App\Http\Controllers\API\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -20,5 +20,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user', [UserController::class, 'user']);
     Route::post('user', [UserController::class, 'user_update']);
     Route::post('change_password', [UserController::class, 'change_password']);
+    Route::get('exchanges', [ExchangesController::class, 'exchanges']);
 });
 

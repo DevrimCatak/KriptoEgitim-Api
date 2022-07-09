@@ -14,10 +14,10 @@ class LessonController extends Controller
 {
     public function lessons($course_id){
         $user = auth('sanctum')->user();
-        $lessons = DB::select('select title, detail, banner, banner_type, status,
-            count(Completed_lessons.id) as completed from Lessons
-            left join Completed_lessons on Completed_lessons.lesson_id = Lessons.id
-            and Completed_lessons.user_id = ? WHERE lessons.course_id = ? group by lessons.id' , [$user->id, $course_id]);
+        $lessons = DB::select('select lessons.id, title, explanation, detail, banner, banner_type, status,
+            count(completed_lessons.id) as completed from lessons
+            left join completed_lessons on completed_lessons.lesson_id = lessons.id
+            and completed_lessons.user_id = ? WHERE lessons.course_id = ? group by lessons.id, title, explanation, detail, banner, banner_type, status' , [$user->id, $course_id]);
 
         if($lessons != null){
             return response()->json(['status' => true, 'message' => "Dersler başarıyla listelendi",'data'=>$lessons]);
@@ -28,11 +28,12 @@ class LessonController extends Controller
 
     public function lesson($lesson_id){
         $user = auth('sanctum')->user();
-        $lesson = DB::select('select Lessons.title, Lessons.detail, Lessons.banner, Lessons.banner_type, Lessons.status,
-            Courses.title as courses_itle, count(Completed_lessons.id) as completed from Lessons
-            left join Courses on Courses.id = Lessons.course_id
-            left join Completed_lessons on Completed_lessons.lesson_id = Lessons.id
-            and Completed_lessons.user_id = ? WHERE lessons.id = ? group by Lessons.id, Courses.id' , [$user->id, $lesson_id]);
+        $lesson = DB::select('select lessons.title, lessons.detail, lessons.banner, lessons.banner_type, lessons.status,
+            courses.title as courses_title, count(completed_lessons.id) as completed from lessons
+            left join courses on courses.id = lessons.course_id
+            left join completed_lessons on completed_lessons.lesson_id = lessons.id
+            and completed_lessons.user_id = ? WHERE lessons.id = ? group by lessons.id, courses.id, lessons.title, lessons.detail, lessons.banner, lessons.banner_type,
+            lessons.status, courses_title' , [$user->id, $lesson_id]);
 
         if($lesson != null){
             return response()->json(['status' => true, 'message' => "Ders başarıyla listelendi",'data'=>$lesson]);
@@ -43,7 +44,7 @@ class LessonController extends Controller
 
     public function completedLesson($lesson_id){
         $user = auth('sanctum')->user();
-        $lesson = CompletedLesson::where('lesson_id', $lesson_id)->first();
+        $lesson = Lesson::where('id', $lesson_id)->first();
 
         if ($lesson != null){
 
@@ -54,7 +55,6 @@ class LessonController extends Controller
                 $new_lesson = CompletedLesson::create([
                         'user_id' => $user->id,
                         'lesson_id' => $lesson_id,
-
                     ]
                 );
 
@@ -64,7 +64,7 @@ class LessonController extends Controller
                     return response()->json(['status' => false, 'message' => "Hata! Daha sonra tekrar deneyiniz."]);
                 }
             } else {
-                return response()->json(['status' => false, 'message' => "Hata! Bu dersi daha önce tamamlamışsınız."]);
+                return response()->json(['true' => true, 'message' => "Kursunuz başarıyla tamamlandı"]);
             }
         } else {
             return response()->json(['status' => false, 'message' => "Hata! Ders bulunamadı, lütfen daha sonra tekrar deneyiniz."]);
@@ -76,7 +76,7 @@ class LessonController extends Controller
         $questions = Question::where('lesson_id', $lesson_id)->with('answers')->get();
 
         if($questions->isNotEmpty()){
-            return response()->json(['status' => true, 'message' => "Sorular başarıyla listelendi",'Questions'=> $questions]);
+            return response()->json(['status' => true, 'message' => "Sorular başarıyla listelendi",'data'=> $questions]);
         }else{
             return response()->json(['status' => false, 'message' => "Hata! Daha sonra tekrar deneyiniz."]);
         }
